@@ -1,7 +1,6 @@
-require('dotenv').config()
 const {MongoClient} = require('mongodb')
 
-const uri = process.env.MONGO_URI 
+const uri = 'mongodb+srv://brokersphere-data:realestate-agent@brokersphere.gudt4.mongodb.net/?retryWrites=true&w=majority' 
 
 
 const client = new MongoClient(uri,{useNewUrlParser: true, useUnifiedTopology: true,})
