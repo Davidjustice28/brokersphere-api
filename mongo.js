@@ -1,7 +1,8 @@
 require('dotenv').config()
 const {MongoClient} = require('mongodb')
 
-const uri = process.env.MONGO_uri
+const uri = process.env.MONGO_URI 
+
 
 const client = new MongoClient(uri,{useNewUrlParser: true, useUnifiedTopology: true,})
 const getDbUsers = async() => {
