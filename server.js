@@ -27,6 +27,6 @@ app.post('/users', async(req,res) => {
 })
 app.use(express.json())
 
-app.listen(process.env.PORT | port,() => {
+app.listen(port,() => {
     console.log('Listening on port 5000')
 })
