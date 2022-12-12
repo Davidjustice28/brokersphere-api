@@ -82,7 +82,7 @@ async function deleteReferral(referral) {
   try {
     const db = await client.db('test_data').collection('referrals')
     // Query for a movie that has title "Annie Hall"
-    const query = {_id:referral.id };
+    const query = {_id:referral._id };
     const result = await movies.deleteOne(query);
     if (result.deletedCount === 1) {
       console.log("Successfully deleted one document.");
