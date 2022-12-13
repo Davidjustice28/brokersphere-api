@@ -1,17 +1,13 @@
 const express = require('express')
 require('dotenv').config()
 const app = express()
-const {getDbUsers, insertUser, getReferrals,insertReferral,deleteReferral,updateUserLeads, getListings} = require('./mongo')
+const {getDbUsers, insertUser, getReferrals,insertReferral,deleteReferral,updateUserLeads, getListings, updateListingComments,insertListing} = require('./mongo')
 const cors = require('cors')
 
 const port = 5000
 
-const corsOptions ={
-    origin:'http://localhost:3000', 
-    credentials:true,            //access-control-allow-credentials:true
-    optionSuccessStatus:200
-}
-app.use(cors(corsOptions))
+app.use(cors())
+app.use(express.json())
 
 app.get('/api', (req,res) => {
     res.send('You are connected to the Brokersphere Api')
@@ -49,6 +45,20 @@ app.post('/api/referrals', async(req,res) => {
     res.json(result)
 })
 
+app.post('/api/listings', async (req,res) => {
+    let {img,address,taxes,price,bedrooms,bathrooms,squarefeet,condition,likes,dislikes,agent} = await req.body
+    let result = await insertListing(img,address,price,bedrooms,bathrooms,squarefeet,taxes,condition,likes,dislikes,agent)
+    console.log(result)
+    res.json(result) 
+})
+
+app.put('/api/listings/comment', async (req,res) => {
+    let {listing,comment} = req.body
+    let result = await updateListingComments(listing,comment)
+    res.json(result)
+})
+
+
 app.delete('/api/referrals', async (req,res) => {
     const Referral = req.body.Referral
     let result = await deleteReferral(Referral)
@@ -56,12 +66,11 @@ app.delete('/api/referrals', async (req,res) => {
 })
 
 app.put('/api/users/leads', async (req,res) => {
-    let {user,referral} = req.body
-    let result = await updateUserLeads(user,referral)
+    let {user,Referral} = req.body
+    let result = await updateUserLeads(user,Referral)
     res.json(result)
 })
 
-app.use(express.json())
 
 app.listen(process.env.PORT || port,() => {
     console.log('Listening on port 5000')

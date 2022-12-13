@@ -143,6 +143,54 @@ async function updateUserLeads(user,referral) {
   }
 }
 
+async function updateListingComments(listing,comment) {
+  try {
+    const db = await client.db('test_data').collection('listings')
+    const filter = { _id: listing._id };
+    const options = { upsert: true };
+    const updateDoc = {
+      $push: {
+        comments: comment
+      },
+    };
+    const result = await db.updateOne(filter, updateDoc, options);
+    console.log(
+      `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
+    );
+
+    return result.modifiedCount
+  } finally {
+    await client.close();
+  }
+}
+
+async function insertListing(IMG,ADDRESS,PRICE,BEDS,BATHS,SQFT,TAX,COND,LIKES,DISLIKES,AGENT) {
+  try {
+    const db = await client.db('test_data').collection('listings')
+    // create a document to insert
+    const doc = {
+      img: IMG,
+      address: ADDRESS,
+      price: PRICE,
+      bedrooms: BEDS,
+      bathrooms: BATHS,
+      squarefeet: SQFT,
+      taxes: TAX,
+      condition: COND,
+      likes: LIKES,
+      dislikes: DISLIKES,
+      agent: AGENT
+  }
+    const result = await db.insertOne(doc);
+    return `A document was inserted with the _id: ${result.insertedId}`;
+  } catch(err) {
+      console.log(err)
+      return 'listing insert failed'
+  } finally {
+    await client.close();
+  }
+}
+
 
 
 module.exports.getDbUsers = getDbUsers
@@ -152,3 +200,5 @@ module.exports.getReferrals = getReferrals
 module.exports.deleteReferral = deleteReferral
 module.exports.updateUserLeads = updateUserLeads
 module.exports.getListings = getListings
+module.exports.updateListingComments = updateListingComments
+module.exports.insertListing = insertListing
