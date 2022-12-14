@@ -41,8 +41,8 @@ app.post('/images',upload.single('image') ,(req,res) => {
         }
 
     */
-   console.log("req.file",req.file)
-   res.send("200")
+   console.log("req.file",req.files)
+   res.send(req)
    
 })
 
