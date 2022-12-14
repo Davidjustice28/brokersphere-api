@@ -7,6 +7,10 @@ const AWS = require('aws-sdk')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
 
+const bodyParser = require('body-parser')
+var bodyParser = require('body-parser')
+
+bodyParser.json()
 const multer = require('multer')
 const uploadMiddleware = multer({dest: 'Images'})
 
@@ -17,6 +21,8 @@ const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY
 })
+
+
 
 const port = 8000
 
