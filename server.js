@@ -7,6 +7,10 @@ const AWS = require('aws-sdk')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
 
+const multer = require('multer')
+const uploadMiddleware = multer({dest: 'Images'})
+
+
 
 
 const s3 = new AWS.S3({
@@ -41,7 +45,8 @@ app.get('/api/listings', async (req,res) => {
     res.json(data)
 })
 
-app.get('/api/images', async (req,res) => {
+app.get('/api/images',async (req,res) => {
+
     async function getImages() {
         const {Contents} = await s3.listObjectsV2({
             Bucket: 'brokersphere-images'
@@ -57,14 +62,13 @@ app.get('/api/images', async (req,res) => {
     res.json(imageList)
 })
 
-app.post('/images', (req,res) => {
-    const imagePath = req.files[0].path
-    const blob = fs.readFileSync(imagePath)
-
+app.post('/images',uploadMiddleware('image') ,(req,res) => {
+    console.log(req.file)
     const uploadParams = {
         Bucket: 'brokersphere-images',
-        Key: req.files[0].originalFilename,
-        Body:blob,
+        Key: req.file.originalname,
+        Body:req.file.buffer,
+        ContentType: req.file.mimetype
     }
 
     s3.upload(uploadParams,(err,data) => {
