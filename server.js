@@ -83,7 +83,7 @@ app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
         }
     })
     */
-   return req.json()
+   res.json(req)
 })
 
 app.post('/api/users', async(req,res) => {
