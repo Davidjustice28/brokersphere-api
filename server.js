@@ -3,11 +3,21 @@ require('dotenv').config()
 const app = express()
 const {getDbUsers, insertUser, getReferrals,insertReferral,deleteReferral,updateUserLeads, getListings, updateListingComments,insertListing} = require('./mongo')
 const cors = require('cors')
+const AWS = require('aws-sdk')
+const fileUpload = require('express-fileupload')
 
-const port = 5000
+
+const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY
+})
+
+const port = 8000
+
 
 app.use(cors())
 app.use(express.json())
+app.use(fileUpload())
 
 app.get('/api', (req,res) => {
     res.send('You are connected to the Brokersphere Api')
@@ -27,6 +37,43 @@ app.get('/api/referrals', async (req,res) => {
 app.get('/api/listings', async (req,res) => {
     const data = await getListings()
     res.json(data)
+})
+
+app.get('/api/images', async (req,res) => {
+    async function getImages() {
+        const {Contents} = await s3.listObjectsV2({
+            Bucket: 'brokersphere-images'
+        }).promise()
+        let data = Contents.map((item) => {
+            return `https://brokersphere-images.s3.amazonaws.com/${item.Key}`
+        })
+        console.log(data)
+        return data
+    }
+
+    let imageList = await getImages()
+    res.json(imageList)
+})
+
+app.post('/images', (req,res) => {
+    const uploadParams = {
+        Bucket: 'brokersphere-images',
+        Key: req.files.file.name,
+        Body:Buffer.from(req.files.file.data),
+        ContentType:req.files.file.mimetype,
+        ACL:'public-read'
+    }
+
+    s3.upload(uploadParams,(err,data) => {
+        if(err) {
+            console.log("Error", err)
+        }
+        else {
+            console.log("upload success", data.Location)
+            let url = `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}`
+            return url
+        }
+    })
 })
 
 app.post('/api/users', async(req,res) => {

@@ -1,14 +1,16 @@
 const {MongoClient} = require('mongodb')
+require('dotenv').config()
 
-const uri = 'mongodb+srv://brokersphere-data:realestate-agent@brokersphere.gudt4.mongodb.net/?retryWrites=true&w=majority' 
+const URI = process.env.MONGO_URI
 
 
-const client = new MongoClient(uri,{useNewUrlParser: true, useUnifiedTopology: true,})
+const client = new MongoClient(URI,{useNewUrlParser: true, useUnifiedTopology: true,})
 const getDbUsers = async() => {
     try {
         await client.connect()
         console.log('connected to database')
         const data = await getUsers()
+        console.log(data)
         return data
 
     }
@@ -190,7 +192,6 @@ async function insertListing(IMG,ADDRESS,PRICE,BEDS,BATHS,SQFT,TAX,COND,LIKES,DI
     await client.close();
   }
 }
-
 
 
 module.exports.getDbUsers = getDbUsers
