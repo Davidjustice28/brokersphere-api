@@ -5,12 +5,9 @@ const {getDbUsers, insertUser, getReferrals,insertReferral,deleteReferral,update
 const cors = require('cors')
 const AWS = require('aws-sdk')
 const fileUpload = require('express-fileupload')
-const fs = require('fs')
-
-const bodyParser = require('body-parser')
 
 const multer = require('multer')
-const uploadMiddleware = multer({dest: 'Images'})
+const upload = multer({dest: './Images'})
 
 
 
@@ -23,6 +20,30 @@ const s3 = new AWS.S3({
 
 
 const port = 8000
+
+app.post('/images',upload.single('image') ,(req,res) => {
+    /*
+    const uploadParams = {
+        Bucket: 'brokersphere-images',
+        Key: req.file.originalname,
+        Body:req.file.buffer,
+        ContentType: req.file.mimetype
+    }
+
+    s3.upload(uploadParams,(err,data) => {
+        if(err) {
+            console.log("Error", err)
+        }
+        else {
+            console.log("upload success", data.Location)
+            let url = `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}`
+            return url
+        }
+
+    */
+   console.log("request", req)
+   res.send("200")
+})
 
 
 app.use(cors())
@@ -110,34 +131,7 @@ app.put('/api/users/leads', async (req,res) => {
 })
 
 
-app.use(bodyParser.json())
-app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
-    /*
-    const uploadParams = {
-        Bucket: 'brokersphere-images',
-        Key: req.file.originalname,
-        Body:req.file.buffer,
-        ContentType: req.file.mimetype
-    }
 
-    s3.upload(uploadParams,(err,data) => {
-        if(err) {
-            console.log("Error", err)
-        }
-        else {
-            console.log("upload success", data.Location)
-            let url = `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}`
-            return url
-        }
-
-    */
-   if(req.files) {
-    res.json(req.files)
-   }
-   else {
-    res.json(req)
-   }
-})
 
 app.listen(process.env.PORT || port,() => {
     console.log('Listening on port 5000')
