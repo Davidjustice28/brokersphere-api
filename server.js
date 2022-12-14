@@ -63,7 +63,6 @@ app.get('/api/images',async (req,res) => {
 })
 
 app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
-    console.log(req)
     /*
     const uploadParams = {
         Bucket: 'brokersphere-images',
@@ -81,9 +80,14 @@ app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
             let url = `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}`
             return url
         }
-    })
+
     */
-   res.json(req)
+   if(req.files) {
+    res.json(req.files)
+   }
+   else {
+    res.json(req)
+   }
 })
 
 app.post('/api/users', async(req,res) => {
