@@ -63,7 +63,8 @@ app.get('/api/images',async (req,res) => {
 })
 
 app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
-    console.log(req.file)
+    console.log(req)
+    /*
     const uploadParams = {
         Bucket: 'brokersphere-images',
         Key: req.file.originalname,
@@ -81,6 +82,8 @@ app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
             return url
         }
     })
+    */
+   return req.json()
 })
 
 app.post('/api/users', async(req,res) => {
