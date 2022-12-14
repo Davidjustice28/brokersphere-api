@@ -8,9 +8,7 @@ const fileUpload = require('express-fileupload')
 const fs = require('fs')
 
 const bodyParser = require('body-parser')
-var bodyParser = require('body-parser')
 
-bodyParser.json()
 const multer = require('multer')
 const uploadMiddleware = multer({dest: 'Images'})
 
@@ -68,33 +66,6 @@ app.get('/api/images',async (req,res) => {
     res.json(imageList)
 })
 
-app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
-    /*
-    const uploadParams = {
-        Bucket: 'brokersphere-images',
-        Key: req.file.originalname,
-        Body:req.file.buffer,
-        ContentType: req.file.mimetype
-    }
-
-    s3.upload(uploadParams,(err,data) => {
-        if(err) {
-            console.log("Error", err)
-        }
-        else {
-            console.log("upload success", data.Location)
-            let url = `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}`
-            return url
-        }
-
-    */
-   if(req.files) {
-    res.json(req.files)
-   }
-   else {
-    res.json(req)
-   }
-})
 
 app.post('/api/users', async(req,res) => {
     let {Name,Username,Email,Password,Bio,Photo,Tags,State,Leads} = await req.body
@@ -138,6 +109,35 @@ app.put('/api/users/leads', async (req,res) => {
     res.json(result)
 })
 
+
+app.use(bodyParser.json())
+app.post('/images',uploadMiddleware.single('image') ,(req,res) => {
+    /*
+    const uploadParams = {
+        Bucket: 'brokersphere-images',
+        Key: req.file.originalname,
+        Body:req.file.buffer,
+        ContentType: req.file.mimetype
+    }
+
+    s3.upload(uploadParams,(err,data) => {
+        if(err) {
+            console.log("Error", err)
+        }
+        else {
+            console.log("upload success", data.Location)
+            let url = `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}`
+            return url
+        }
+
+    */
+   if(req.files) {
+    res.json(req.files)
+   }
+   else {
+    res.json(req)
+   }
+})
 
 app.listen(process.env.PORT || port,() => {
     console.log('Listening on port 5000')
