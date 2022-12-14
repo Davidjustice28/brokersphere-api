@@ -5,6 +5,8 @@ const {getDbUsers, insertUser, getReferrals,insertReferral,deleteReferral,update
 const cors = require('cors')
 const AWS = require('aws-sdk')
 const fileUpload = require('express-fileupload')
+const fs = require('fs')
+
 
 
 const s3 = new AWS.S3({
@@ -56,12 +58,13 @@ app.get('/api/images', async (req,res) => {
 })
 
 app.post('/images', (req,res) => {
+    const imagePath = req.files[0].path
+    const blob = fs.readFileSync(imagePath)
+
     const uploadParams = {
         Bucket: 'brokersphere-images',
-        Key: req.files.file.name,
-        Body:Buffer.from(req.files.file.data),
-        ContentType:req.files.file.mimetype,
-        ACL:'public-read'
+        Key: req.files[0].originalFilename,
+        Body:blob,
     }
 
     s3.upload(uploadParams,(err,data) => {
@@ -122,3 +125,5 @@ app.put('/api/users/leads', async (req,res) => {
 app.listen(process.env.PORT || port,() => {
     console.log('Listening on port 5000')
 })
+
+
