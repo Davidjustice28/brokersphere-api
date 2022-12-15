@@ -41,6 +41,7 @@ app.post('/images',upload.single('file') ,(req,res) => {
         }
 
     */
+   console.log(req.files)
    res.json({status: "success"})
    
 })
