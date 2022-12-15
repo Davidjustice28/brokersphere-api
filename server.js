@@ -7,7 +7,7 @@ const AWS = require('aws-sdk')
 const fileUpload = require('express-fileupload')
 
 const multer = require('multer')
-const upload = multer({dest: './Images'})
+const upload = multer({dest: 'uploads/'})
 
 
 
@@ -21,7 +21,7 @@ const s3 = new AWS.S3({
 
 const port = 8000
 
-app.post('/images',upload.single('image') ,(req,res) => {
+app.post('/images',upload.single('file') ,(req,res) => {
     /*
     const uploadParams = {
         Bucket: 'brokersphere-images',
@@ -41,8 +41,7 @@ app.post('/images',upload.single('image') ,(req,res) => {
         }
 
     */
-   console.log("req.file",req.files)
-   res.send(req)
+   res.json({status: "success"})
    
 })
 
