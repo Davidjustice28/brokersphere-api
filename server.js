@@ -5,49 +5,57 @@ const {getDbUsers, insertUser, getReferrals,insertReferral,deleteReferral,update
 const cors = require('cors')
 const AWS = require('aws-sdk')
 const fileUpload = require('express-fileupload')
+const fs = require('fs')
 
 const multer = require('multer')
-const upload = multer({dest: 'uploads/'})
 
+app.use(cors())
 
-
+const port = 8000
 
 const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY
 })
 
-
-
-const port = 8000
-
-app.post('/images',upload.single('file') ,(req,res) => {
-    /*
-    const uploadParams = {
-        Bucket: 'brokersphere-images',
-        Key: req.file.originalname,
-        Body:req.file.buffer,
-        ContentType: req.file.mimetype
-    }
-
-    s3.upload(uploadParams,(err,data) => {
-        if(err) {
-            console.log("Error", err)
-        }
-        else {
-            console.log("upload success", data.Location)
-            let url = `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}`
-            return url
-        }
-
-    */
-   console.log(req.files)
-   res.json({status: "success"})
-   
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+    cb(null,'uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' +file.originalname )
+  }
 })
 
+var upload = multer({ storage: storage }).single('file')
 
-app.use(cors())
+
+app.post('/uploadImage', async function(req, res) {
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(500).json(err)
+        } else if (err) {
+            return res.status(500).json(err)
+        }
+        console.log(req.file)
+        console.log(req.file.path)
+
+        //
+        const fsStream = fs.createReadStream(req.file.path)
+        const uploadParams = {
+            Bucket: 'brokersphere-images',
+            Key: req.file.originalname,
+            Body:fsStream,
+            ContentType: req.file.mimetype
+        }
+
+        s3.upload(uploadParams).promise()
+        res.json({ url: `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}` });
+    })
+
+});
+
+
 app.use(express.json())
 app.use(fileUpload())
 
