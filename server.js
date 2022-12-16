@@ -134,8 +134,10 @@ app.delete('/api/referrals', async (req,res) => {
 })
 
 app.put('/api/users/leads', async (req,res) => {
-    let {user,Referral} = req.body
-    let result = await updateUserLeads(user,Referral)
+    let {id,Referral} = req.body
+    console.log(id)
+    console.log(Referral)
+    let result = await updateUserLeads(Referral,id)
     res.json(result)
 })
 

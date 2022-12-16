@@ -1,5 +1,7 @@
 const {MongoClient} = require('mongodb')
 require('dotenv').config()
+const {ObjectId} = require('mongodb')
+
 
 const URI = process.env.MONGO_URI
 
@@ -124,17 +126,17 @@ async function insertUser(name,username,email,password,photo,bio,state,tagsArray
     }
 }
 
-async function updateUserLeads(user,referral) {
+async function updateUserLeads(referral,Id) {
   try {
+    await client.connect()
     const db = await client.db('test_data').collection('users')
-    const filter = { _id: user._id };
     const options = { upsert: true };
     const updateDoc = {
       $push: {
         leads: referral
       },
     };
-    const result = await db.updateOne(filter, updateDoc, options);
+    const result = await db.updateOne({_id: ObjectId(Id)}, updateDoc, options);
     console.log(
       `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
     );
