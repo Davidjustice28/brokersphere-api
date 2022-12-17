@@ -84,10 +84,11 @@ async function insertReferral(agent,type,location,financing,budget,email,number,
 
 async function deleteReferral(referral) {
   try {
+    await client.connect()
     const db = await client.db('test_data').collection('referrals')
     // Query for a movie that has title "Annie Hall"
-    const query = {_id:referral._id };
-    const result = await movies.deleteOne(query);
+    const query = {_id: ObjectId(referral._id)};
+    const result = await db.deleteOne(query);
     if (result.deletedCount === 1) {
       console.log("Successfully deleted one document.");
       return 'referral deleted'
@@ -114,7 +115,7 @@ async function insertUser(name,username,email,password,photo,bio,state,tagsArray
         Bio: bio,
         State: state,
         Tags: tagsArray,
-        Leads: leadsArray
+        leads: leadsArray
       }
       const result = await db.insertOne(doc);
       return `A document was inserted with the _id: ${result.insertedId}`;
@@ -130,13 +131,12 @@ async function updateUserLeads(referral,Id) {
   try {
     await client.connect()
     const db = await client.db('test_data').collection('users')
-    const options = { upsert: true };
     const updateDoc = {
       $push: {
         leads: referral
       },
     };
-    const result = await db.updateOne({_id: ObjectId(Id)}, updateDoc, options);
+    const result = await db.updateOne({_id: ObjectId(Id)}, updateDoc);
     console.log(
       `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
     );
@@ -147,17 +147,17 @@ async function updateUserLeads(referral,Id) {
   }
 }
 
-async function updateListingComments(listing,comment) {
+async function updateListingComments(listingId,comment) {
   try {
+    await client.connect()
     const db = await client.db('test_data').collection('listings')
-    const filter = { _id: listing._id };
-    const options = { upsert: true };
+    const filter = { _id: ObjectId(listingId)};
     const updateDoc = {
       $push: {
         comments: comment
       },
     };
-    const result = await db.updateOne(filter, updateDoc, options);
+    const result = await db.updateOne(filter, updateDoc);
     console.log(
       `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
     );
@@ -168,7 +168,7 @@ async function updateListingComments(listing,comment) {
   }
 }
 
-async function insertListing(IMG,ADDRESS,PRICE,BEDS,BATHS,SQFT,TAX,COND,LIKES,DISLIKES,AGENT) {
+async function insertListing(IMG,ADDRESS,PRICE,BEDS,BATHS,SQFT,TAX,COND,LIKES,DISLIKES,AGENT,WEBSITE) {
   try {
     const db = await client.db('test_data').collection('listings')
     // create a document to insert
@@ -183,7 +183,9 @@ async function insertListing(IMG,ADDRESS,PRICE,BEDS,BATHS,SQFT,TAX,COND,LIKES,DI
       condition: COND,
       likes: LIKES,
       dislikes: DISLIKES,
-      agent: AGENT
+      agent: AGENT,
+      comments: [],
+      website:WEBSITE
   }
     const result = await db.insertOne(doc);
     return `A document was inserted with the _id: ${result.insertedId}`;

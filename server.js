@@ -98,8 +98,8 @@ app.get('/api/images',async (req,res) => {
 
 
 app.post('/api/users', async(req,res) => {
-    let {Name,Username,Email,Password,Bio,Photo,Tags,State,Leads} = await req.body
-    let result = await insertUser(Name,Username,Email,Password,Photo,Bio,State,Tags,Leads)
+    let {Name,Username,Email,Password,Bio,Photo,Tags,State,leads} = await req.body
+    let result = await insertUser(Name,Username,Email,Password,Photo,Bio,State,Tags,leads)
     console.log(result)
     res.json(result) 
 })
@@ -114,29 +114,25 @@ app.post('/api/referrals', async(req,res) => {
 })
 
 app.post('/api/listings', async (req,res) => {
-    let {img,address,taxes,price,bedrooms,bathrooms,squarefeet,condition,likes,dislikes,agent} = await req.body
-    let result = await insertListing(img,address,price,bedrooms,bathrooms,squarefeet,taxes,condition,likes,dislikes,agent)
+    let {img,address,taxes,price,bedrooms,bathrooms,squarefeet,condition,likes,dislikes,agent,website} = await req.body
+    let result = await insertListing(img,address,price,bedrooms,bathrooms,squarefeet,taxes,condition,likes,dislikes,agent,website)
     console.log(result)
     res.json(result) 
 })
 
 app.put('/api/listings/comment', async (req,res) => {
-    let {listing,comment} = req.body
-    let result = await updateListingComments(listing,comment)
+    let result = await updateListingComments(req.body.data.listing._id,req.body.data.comment)
     res.json(result)
 })
 
 
 app.delete('/api/referrals', async (req,res) => {
-    const Referral = req.body.Referral
-    let result = await deleteReferral(Referral)
+    let result = await deleteReferral(req.body.Referral)
     res.json(result)
 })
 
 app.put('/api/users/leads', async (req,res) => {
-    let {id,Referral} = req.body
-    console.log(id)
-    console.log(Referral)
+    let {id,Referral} = req.body.data
     let result = await updateUserLeads(Referral,id)
     res.json(result)
 })
@@ -147,5 +143,3 @@ app.put('/api/users/leads', async (req,res) => {
 app.listen(process.env.PORT || port,() => {
     console.log('Listening on port 5000')
 })
-
-
