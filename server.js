@@ -11,7 +11,7 @@ const multer = require('multer')
 
 app.use(cors())
 
-const port = 8000
+const port = 3000
 
 const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -37,8 +37,8 @@ app.post('/uploadImage', async function(req, res) {
         } else if (err) {
             return res.status(500).json(err)
         }
-        console.log(req.file)
-        console.log(req.file.path)
+        //console.log(req.file)
+        //console.log(req.file.path)
 
         //
         const fsStream = fs.createReadStream(req.file.path)
@@ -50,7 +50,12 @@ app.post('/uploadImage', async function(req, res) {
         }
 
         s3.upload(uploadParams).promise()
-        res.json({ url: `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}` });
+        .then(data => {
+            console.log({location: data.Location})
+            res.json({ url: data.Location})
+        })
+        .catch(err => res.status(400).send(err))
+        //res.json({ url: `https://brokersphere-images.s3.amazonaws.com/${uploadParams.Key}` });
     })
 
 });
@@ -140,6 +145,6 @@ app.put('/api/users/leads', async (req,res) => {
 
 
 
-app.listen(process.env.PORT || port,() => {
-    console.log('Listening on port 5000')
+app.listen(port, "0.0.0.0",() => {
+    console.log('Listening on port 3000')
 })

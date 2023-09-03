@@ -3,8 +3,10 @@ require('dotenv').config()
 const {ObjectId} = require('mongodb')
 
 
-const URI = process.env.MONGO_URI
+// const URI = process.env.MONGO_URI
+const URI = "mongodb+srv://brokersphere-data:realestate-agent@brokersphere.gudt4.mongodb.net/?retryWrites=true&w=majority"
 
+console.log(URI)
 
 const client = new MongoClient(URI,{useNewUrlParser: true, useUnifiedTopology: true,})
 const getDbUsers = async() => {
